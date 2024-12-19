@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct JournalRow: View {
+    @State private var animateView: Bool = false
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -15,6 +17,8 @@ struct JournalRow: View {
                     .resizable()
                     .aspectRatio(1.2, contentMode: .fit)
                     .clipShape(.rect(cornerRadius: 30))
+                    .blur(radius: animateView ? 0 : 10)
+                    .scaleEffect(animateView ? 1 : 0.4)
                 
                 VStack(spacing: 4) {
                     RoundedRectangle(cornerRadius: 25)
@@ -81,7 +85,7 @@ struct JournalRow: View {
             
             RoundedRectangle(cornerRadius: 30)
                 .foregroundStyle(.ultraThinMaterial)
-                .frame(height: 60)
+                .frame(height: 55)
                 .overlay {
                     HStack(spacing: 0) {
                         Text("Thu, Sep 20")
@@ -109,6 +113,11 @@ struct JournalRow: View {
         .background(Color.white)
         .padding(.horizontal, 8)
         .clipShape(.rect(cornerRadius: 50))
+        .onAppear {
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.7, blendDuration: 0.2)) {
+                animateView = true
+            }
+        }
     }
 }
 
