@@ -15,7 +15,7 @@ struct JournalRow: View {
             HStack {
                 Image(.stock)
                     .resizable()
-                    .aspectRatio(1.2, contentMode: .fit)
+                    .aspectRatio(1.3, contentMode: .fit)
                     .clipShape(.rect(cornerRadius: 30))
                     .blur(radius: animateView ? 0 : 10)
                     .scaleEffect(animateView ? 1 : 0.4)
