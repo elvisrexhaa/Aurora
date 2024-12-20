@@ -9,16 +9,20 @@ import SwiftUI
 
 struct JournalRow: View {
     @State private var animateView: Bool = false
+    let entry: JournalEntry
     
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Image(.stock)
-                    .resizable()
-                    .aspectRatio(1.3, contentMode: .fit)
-                    .clipShape(.rect(cornerRadius: 30))
-                    .blur(radius: animateView ? 0 : 10)
-                    .scaleEffect(animateView ? 1 : 0.4)
+                if let imageData = entry.entryImageData, let uiImage = UIImage(data: imageData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(1.3, contentMode: .fit)
+                        .clipShape(.rect(cornerRadius: 30))
+                        .blur(radius: animateView ? 0 : 10)
+                        .scaleEffect(animateView ? 1 : 0.4)
+                }
+                    
                 
                 VStack(spacing: 4) {
                     RoundedRectangle(cornerRadius: 25)
@@ -81,7 +85,7 @@ struct JournalRow: View {
                 .padding(.trailing, 3)
             }
             
-            Text("Morning Visit, Maui Beach.\nLast night my dream featured surfing.\nWhenever this occurs, I am confident that I will have an excellent day on the water.")
+            Text(entry.entryText)
             
             RoundedRectangle(cornerRadius: 30)
                 .foregroundStyle(.ultraThinMaterial)
@@ -122,7 +126,7 @@ struct JournalRow: View {
 }
 
 #Preview {
-    JournalRow()
+    JournalRow(entry: JournalEntry(entryText: "efijkweiufiuhefiuehwi", entryDate: Date(), entryImageData: nil, entryRecordingData: nil))
 }
 
 

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var showEntryCreationSheet = false
+    @StateObject private var homeViewModel = HomeViewModel()
+    @State private var animateHomeView: Bool = false
     var body: some View {
         NavigationStack {
             ZStack {
@@ -16,28 +18,37 @@ struct HomeView: View {
                 AppBackgroundView()
                 
                 VStack(alignment: .leading) {
-                    
-                    Text("Welcome, Elvis")
-                        .font(.headline)
-                        .fontWeight(.regular)
-                        .padding([.leading])
+//                    
+//                    Text("Welcome, Elvis")
+//                        .font(.headline)
+//                        .fontWeight(.regular)
+//                        .padding([.leading])
                    
-                    ScrollView {
-                        LazyVStack {
-                            ForEach(0...2, id: \.self) { _ in
-                                JournalRow()
+                    if homeViewModel.entries.isEmpty {
+                        ContentUnavailableView("No Entries", systemImage: "rectangle.on.rectangle.slash", description: Text("Click the plus button below\nto add new entries"))
+
+                    } else {
+                        ScrollView {
+                            LazyVStack {
+                                ForEach(homeViewModel.entries) { entry in
+                                    JournalRow(entry: entry)
+                                }
                             }
+//                            .padding(.bottom, 80)
+                            
                         }
-                        .padding(.bottom, 80)
+                        .padding(.top, 50)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+//                .padding(.top, 50)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Text("Aurora")
                         .font(.largeTitle)
                         .fontWeight(.semibold)
+                        .padding(.top, safeAreaInsets().top)
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
@@ -50,6 +61,7 @@ struct HomeView: View {
                                 .fill(.white)
                                 .shadow(radius: 2)
                         }
+                        .padding(.top, safeAreaInsets().top)
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -99,14 +111,24 @@ struct HomeView: View {
                     .padding(.bottom, 30)
                 }
             }
+            .onAppear {
+                withAnimation(.smooth) {
+                    animateHomeView = true
+                }
+            }
             .ignoresSafeArea(edges: .bottom)
             .sheet(isPresented: $showEntryCreationSheet) {
-                EntryCreationView()
+                EntryCreationView(homeViewModel: homeViewModel)
             }
+            
         }
+        
     }
 }
 
 #Preview {
     HomeView()
 }
+
+
+

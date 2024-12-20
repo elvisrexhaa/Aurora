@@ -10,6 +10,14 @@ import SwiftUI
 struct EntryCreationView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var entryText: String = ""
+    
+    var homeViewModel: HomeViewModel
+    @StateObject var entryCreationViewModel: EntryCreationViewModel
+    init(homeViewModel: HomeViewModel) {
+        self.homeViewModel = homeViewModel
+        _entryCreationViewModel = StateObject(wrappedValue: EntryCreationViewModel(homeViewModel: homeViewModel))
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -19,19 +27,20 @@ struct EntryCreationView: View {
                     GeometryReader {
                         let size = $0.size
                         
-                        TextField(text: $entryText, axis: .vertical) {
+                        TextField(text: $entryCreationViewModel.entryText, axis: .vertical) {
                             Text("Type here...")
                         }
                         .padding()
+                        .frame(height: size.height, alignment: .top)
                     }
                     .frame(height: 300)
                     .background(Color.white, in: .rect(cornerRadius: 20))
                     .padding(.horizontal)
-                }
-                .overlay(alignment: .bottom) {
+                    
                     HStack {
                         UniversalButton(systemImageName: "photo") {
                             // show photo picker here (toggle)
+                            entryCreationViewModel.showImagePicker.toggle()
                         }
                         
                         .frame(width: 50, height: 50)
@@ -46,28 +55,45 @@ struct EntryCreationView: View {
                         }
                         .shadow(radius: 1)
                         .frame(width: 50, height: 50)
-                        UniversalButton(systemImageName: "") {
+                        UniversalButton(systemImageName: "photo.fill") {
                             //
                         }
                         .shadow(radius: 1)
                         .frame(width: 50, height: 50)
                         
-                        Capsule()
-                            .frame(height: 50)
-                            .foregroundStyle(.ultraThinMaterial)
-                            .shadow(radius: 1)
-                            .overlay {
-                                Text("Save")
-                                    .fontWeight(.semibold)
-                            }
+                        Button {
+                            // save the entry and append to entries array
+                            entryCreationViewModel.addNewEntry()
+                            dismiss()
+                        } label: {
+                            Capsule()
+                                .frame(height: 50)
+                                .foregroundStyle(.ultraThinMaterial)
+                                .shadow(radius: 1)
+                                .overlay {
+                                    Text("Save")
+                                        .fontWeight(.semibold)
+                                }
+                                
+                        }
+                        .buttonStyle(.plain)
+                        
+                            
                     }
                     .padding(.bottom)
-                    .padding(.horizontal, 30)
+                    .padding(.horizontal, 20)
+                    
+                    if let entryImage = entryCreationViewModel.entryImage {
+                        entryImage
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
+                            .padding()
+                    }
+                
                 }
-               
+                
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-               
-               
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
                         UniversalButton(systemImageName: "chevron.left") {
@@ -92,10 +118,11 @@ struct EntryCreationView: View {
                     }
                 }
             }
+            .photosPicker(isPresented: $entryCreationViewModel.showImagePicker, selection: $entryCreationViewModel.selectedItem)
         }
     }
 }
 
 #Preview {
-    EntryCreationView()
+    EntryCreationView(homeViewModel: HomeViewModel())
 }
